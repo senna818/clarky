@@ -1,16 +1,28 @@
-document.getElementById("contactForm").addEventListener("submit", function(event) {
+document.getElementById("contactForm").addEventListener("submit", async function(event) {
     event.preventDefault();
-    
-    let name = document.getElementById("name").value;
-    let email = document.getElementById("email").value;
-    let message = document.getElementById("message").value;
-    
-    if (name && email && message) {
-        document.getElementById("responseMessage").textContent = "Thank you for reaching out! We'll get back to you soon.";
-        document.getElementById("responseMessage").style.color = "green";
-        document.getElementById("contactForm").reset();
-    } else {
-        document.getElementById("responseMessage").textContent = "Please fill out all fields.";
+
+    let form = event.target;
+    let formData = new FormData(form);
+
+    try {
+        let response = await fetch(form.action, {
+            method: "POST",
+            body: formData,
+            headers: {
+                "Accept": "application/json"
+            }
+        });
+
+        if (response.ok) {
+            document.getElementById("responseMessage").textContent = "Thank you! Your message has been sent.";
+            document.getElementById("responseMessage").style.color = "green";
+            form.reset();
+        } else {
+            document.getElementById("responseMessage").textContent = "Oops! Something went wrong.";
+            document.getElementById("responseMessage").style.color = "red";
+        }
+    } catch (error) {
+        document.getElementById("responseMessage").textContent = "Error connecting to the server.";
         document.getElementById("responseMessage").style.color = "red";
     }
 });
